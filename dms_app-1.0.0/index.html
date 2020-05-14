@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="referrer" content="no-referrer">
+<title></title>
+
+<link rel="stylesheet" href="css/css_main.css" />
+<!--<link rel="stylesheet" href="css/jquery.mobile-1.4.5.min.css" /> -->
+<link rel="stylesheet" href="css/tigo-theme.min.css" />
+<link rel="stylesheet" href="css/jquery.mobile.icons.min.css" />
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" /> 
+
+<style type="text/css">
+
+.tbl_boc tr:nth-child(even){
+    background-color: #F2F2F2;
+}
+
+.tbl_boc td {
+    padding:5px;
+}
+
+.tbl_boc tr:hover{
+    background-color: #CEF6CE;
+}
+
+</style>
+
+
+</head>
+<body onresize="resizer()" >
+<!--- Splash  -->
+<div id="bg_login" style="position:absolute; background-color:#D8D8D8; z-index:10; width:100%;" >
+</div>
+<!-- Fin Login Frame -->
+
+<div data-role="page" data-theme="a" id="page"  hidden>
+
+    <div data-role="header" id="dvHead" data-position="fixed" style="position:fixed; border:none; padding-left:7px; padding-top:15px; background-color:#0B0B61; color:#FFF; height:35px">
+        <div style="float:left; margin-left:-2px; margin-right:10px; margin-top:-5px; cursor:pointer"><a href="#dvMenu" onclick="resize_img()"><img src="img/menu_icon2.png" width="35px"/></a></div>
+        <div style="float:right; margin-right:20px; margin-top:-3px; cursor:pointer" onclick="backButton()"><img src="img/backicon.png" width="17px"/></div>
+        <label id="lbl_title">DOCUMENTOS DMS</label>
+        <!--<div class="ui-grid-a" id="subHead">
+            <a href="#dvMenu" id="btnM" class="ui-btn ui-icon-bars ui-btn-icon-notext ui-nodisc-icon" style="border:none; margin-right:6px; margin-left:6px; display:none"></a>
+            <span id="dvtitle">-</span>
+            <a href="#dvMenuConfig" id="btnM" style="float:right; border:none; margin-right:6px;" class="ui-btn ui-icon-power ui-btn-icon-notext ui-nodisc-icon" onclick="logout()"></a>
+        </div>-->
+    </div>
+    <div role="main" id='dvContentG' class="ui-content" style="padding:0px; background-color: #F2F2F2;">
+        <!-- Dv Main -->
+        <div id="dvMain" style="margin:15px"> 
+            <!--<div id="float_btn" class="hamburger"  >
+                <a href="#dvMenu" onclick="resize_img()"><img src="img/menu_icon.png" width="100%" /></a>
+            </div>           -->
+        
+            <div id="dvDMS">
+                <div class="ui-body ui-body-a" id="dvFormsDet">
+                    <h3>Forms Estados</h3>
+                    <div class="ui-grid-a" style="width:90%; margin-bottom:8px">
+                        <div class="ui-block-a">Forms Enviados</div>
+                        <div class="ui-block-b" style="text-align:right" id="forms_sent">0</div>
+                    </div>
+                    <div class="ui-grid-a" style="width:90%">
+                        <div class="ui-block-a">Forms Pendientes</div>
+                        <div class="ui-block-b" style="text-align:right" id="forms_pend">0</div>
+                    </div>  <br />                   
+                </div>
+                <br />
+                <div class="ui-body ui-body-a">
+                    <label style="float:right; margin-top:15px; font-size:0.8em; color:blue; cursor:pointer" onclick="getDatosUsuario()">Actualizar</label>
+                    <h3>Información de Usuario</h3>
+                    <label style="display:block" id="id_dms_user">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Cod DMS</label>
+                    <label style="display:block" id="num_tel">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Num Telefono</label>
+                    <label style="display:block" id="name_user">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Nombre</label> 
+                    <label style="display:block" id="job_user">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Cargo</label> 
+                    <label style="display:block" id="uid_user">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Usuario</label>                     
+                    <label style="display:block" id="email_user">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">Correo</label>
+                    <label style="display:block" id="id_dms_dlr">-</label> 
+                    <label style="display:block; color:#848484; font-size:0.8em; margin-bottom:10px; margin-top:-3px">ID PDV/DLR</label>
+
+                </div><br />
+                <button class="ui-btn ui-corner-all ui-btn-a" onclick="cierreVtasDiaria(0,0)" id="btnCvta">Cerrar Venta Diaria</button>
+                
+                
+            </div><!-- Pagina 1 -->
+            <div id="dvHorus">
+                <!--<div id="mapHorus" style="width:100%; height:150px; margin-bottom:15px"></div>
+                <button id="startGPS" onclick="tracking()">Enviar GPS</button>
+                <button id="stopGPS" onclick="tracking()" data-theme="b">Detener GPS</button>
+
+                <div id="kmts"class="ui-body ui-body-a">
+                    <h3> Recorrido </h3>
+                    <center>
+                    <div id="kmts_num"><h2>0.00 Kmts</h2>
+                    </div>
+                    </center>
+                </div>  --> 
+                <div id="mapHorus" style="width:100%; height:150px; margin-bottom:15px"></div>
+
+                <button id="startGPS" onclick="tracking()">Enviar GPS</button>
+                <button id="stopGPS" onclick="tracking()" data-theme="b">Detener GPS</button>
+
+                <div style = 'margin-bottom:5px'>
+                <center>
+                <button id="ActualizarNodos" onclick="getMancha()" style ="display: inline-block; margin: 0 auto; width: 49% ;">Actualizar Nodos</button>
+                <button id="DibujarNodos" onclick="dibujarMancha()" style ="display: inline-block; margin: 0 auto; width: 49% ;">Dibujar Nodos</button>
+                </center>
+                </div>
+
+                <div id="kmts"class="ui-body ui-body-a"  style="margin-bottom:15px">
+                    <h3> Recorrido </h3>
+                    <div id="dvHoraini" style="float:right; font-size:0.8em; margin-top:-45px; text-align:right"></div>
+                    <center>
+                    <div id="kmts_num"><h2>0.00 Kmts</h2>
+                    </div>
+                    </center>
+                </div> 
+
+             
+
+                <div id="marcacion"class="ui-body ui-body-a" style="margin-bottom:15px">
+                    <h3> Envío de Marcanción </h3>
+                    <label for="marcancionE">PDV</label>
+                    <select id="marcancionE"> 
+                    </select>
+
+                    <label for="telefono" >Teléfono del Cliente </label>
+                    <input type="number" id="telefono">
+
+                    <label for="estadoPago">Estado de pago</label>
+                    <select id="estadoPago"> 
+                    <option value='99'>SELECCIONE</option> 
+                    <option value='1'>Pagó</option> 
+                    <option value='0'>No pagó</option>    
+                    </select>
+
+                    <div id='infoPago'>
+                    <label for="Monto" >Monto Pagado en lempiras </label>
+                    <input type="number" id="monto" value= '0'>
+                    
+                    <label for="metodoPago">Metodo de pago</label>
+                    <select id="metodoPago"> 
+                    <option value='99'>SELECCIONE</option> 
+                    <option value='1'>Tigo Money</option> 
+                    <option value='2'>Efectivo</option>
+                    <option value='3'>POS</option>       
+                    </select>
+                    </div>
+
+
+                    <div style = 'margin-bottom:5px'>
+                        <center>
+                    <button id="GuardarMarcacion" onclick="guardarMarcacion();" style ="display: inline-block; margin: 0 auto; width: 49% ;">Guardar Marcación</button>
+                    <button id="EnviarMarcacion" onclick="enviarMarcacion();" style ="display: inline-block; margin: 0 auto; width: 49% ;">Enviar Marcaciones</button>
+                        </center>
+                    </div>
+
+                    </center>
+
+                </div> 
+
+            </div><!-- Pagina 1 -->
+
+            <!-- Pagina DMS Forms -->
+            <div id="pagDMS_forms">
+                <div id="sbMenuForms" class="ui-grid-b" style="z-index:10; color:white; padding:0px; margin:-15px; margin-bottom:15px; position:fixed; max-height: 50px">
+                    <div class="ui-block-a"><center><button class="btnH" onclick="formsList()" style="margin:0px; border-top:none; border-radius:0px; padding:2px"><img src="img/form_icon2.png" width="27%" style="margin-top:5px"  /></button></center></div>
+                    <div class="ui-block-b"><center><button class="btnH" onclick="formsEnviados()" style="margin:0px; border-top:none; border-radius:0px; padding:2px"><img src="img/forms_sent.png" width="27%" style="margin-top:5px" /></button></center></div>
+                    <div class="ui-block-c"><center><button class="btnH" onclick="formsPendientes()" style="margin:0px; border-top:none; border-radius:0px; padding:2px"><img src="img/pending.png" width="27%" style="margin-top:5px"  /></button></center></div>
+                </div>
+                <br /><br />
+                <div id="forms_list">
+
+                    <button id="btn_upd_forms" onclick="updateForms()">Actualizar</button>
+                    <div data-role="collapsible" data-collapsed="false" data-iconpos="right">
+                        <h4>Formularios</h4>
+                        <div id="tbl_forms">
+                        </div>                        
+                    </div>
+                    <div data-role="collapsible" data-collapsed="false" data-iconpos="right">
+                        <h4>Encuestas</h4>
+                        <div id="tbl_encs">
+                        </div> 
+                    </div>
+                </div>
+                <div id="forms_enviados" class="ui-corner-all custom-corners" style="margin-top:15px">
+                    
+                    <div class="ui-bar ui-bar-a">
+                        <h3> Filtros </h3>
+                    </div>
+                    <div id="tbl_forms_enviados_filt"class="ui-body ui-body-a">
+                        Fecha Inicio
+                        <input type="date" id="fechIniForm"/>
+                        Fecha Fin
+                        <input type="date" id="fechFinForm"/>
+                        <br />
+                        <button id="btn1_forms" onclick="formsEnviados()">Mostrar</button>
+                    </div>                    
+                    <br />
+
+                    <div class="ui-bar ui-bar-a">
+                        <h3> Formularios Enviados </h3>
+                    </div>
+                    <div id="tbl_forms_enviados"class="ui-body ui-body-a">
+                    </div>
+                </div>
+
+                <div id="forms_pendientes" class="ui-corner-all custom-corners" style="margin-top:15px">
+
+                    <button id="btn_enviar_forms" onclick="envioFormsPend()">Enviar Formularios</button>
+                    <div class="ui-bar ui-bar-a">
+                        <h3> Formularios Pendientes </h3>
+                    </div>                    
+                    <div id="tbl_forms_pendientes"class="ui-body ui-body-a">                    
+                    </div>
+                </div>
+
+                <!--Vista Previo Forms -->
+                <br />
+                <div id="formsRPT">
+                    <div class="ui-bar ui-bar-a">
+                        <h3> Detalle Formulario </h3>
+                    </div>                    
+                    <div id="formRPT_Det" class="ui-body ui-body-a" style="font-size:0.9em"> 
+
+                    </div>
+                </div>
+                <br />
+            </div><!-- Fin Pagina DMS Forms -->
+
+            <div id="dvReporteVentas">
+                <div id="sbRptVtas" class="ui-grid-a"  style=" width:100%; min-height:40px; z-index:10; padding:0px; margin:-15px; margin-bottom:20px; position:fixed">
+                    <div class="ui-block-a"><center><button class="btnH" onclick="reporteVentas(0)" style="margin:0px; border-top:none; border-radius:0px; padding:2px; min-height:40px">Reporte Global</button></center></div>
+                    <div class="ui-block-b"><center><button class="btnH" onclick="cierresDiarios(0)" style="margin:0px; border-top:none; border-radius:0px; padding:2px; min-height:40px">Cierres Diarios</button></center></div>
+                </div>
+                <br /><br />
+                <div id="sbRtpGlobal">
+                    <div class="ui-bar ui-bar-a">
+                        <h3>Reporte Global</h3>
+                    </div>
+                    <div class="ui-body ui-body-a">
+                        <label for="anomesRVtas">Año Mes</label>
+                        <select id="anomesRVtas" onchange="changYMVtas(this)">
+                            <option value="-">-</option>
+                        </select>
+                        <input type="button" id="btn_rptGlobal" value="Actualizar" onclick="reloadVentas(1,0)"/> 
+                    </div>
+                    <br />
+                    <div class="ui-body ui-body-a">
+                        <div id="chart1"></div>
+                    </div><br />
+                    <div class="ui-body ui-body-a">
+                        <table style="font-size:0.85em" width="100%" data-role="table" data-mode="columntoggle" class="table-stripe ui-responsive">
+                        <thead>
+                            <tr>
+                                <th width="50%" align="center">Product</th>
+                                <th width="15%" align="center" data-priority="1">Unidad</th>
+                                <th width="35%" align="right" data-priority="critical">Ejecutado</th>
+                                <th width="35%" align="right" data-priority="2">Meta</th>
+                                <th width="35%" align="right" data-priority="1">Resul[%]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EPIN</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="epin_eje">0</td>
+                                <td style="text-align:right" id="epin_met">0</td>
+                                <td style="text-align:right" id="epin_res">0</td>
+                            </tr>
+                            <tr>
+                                <td>TMY</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tmy_eje">0</td>
+                                <td style="text-align:right" id="tmy_met">0</td>
+                                <td style="text-align:right"id="tmy_res">0</td>
+                            </tr>
+                            <tr>
+                                <td>Tarjetas</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tar_eje">0</td>
+                                <td style="text-align:right" id="tar_met">0</td>
+                                <td style="text-align:right" id="tar_res">0</td>
+                            </tr>                            
+                            <tr>
+                                <td>Tarjetas Vas</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tvs_eje">0</td>
+                                <td style="text-align:right" id="tvs_met">0</td>
+                                <td style="text-align:right" id="tvs_res">0</td>
+                            </tr>
+                            <tr>
+                                <td>Smartphones</td>
+                                <td align="center">UND</td>
+                                <td style="text-align:right" id="smt_eje">0</td>
+                                <td style="text-align:right" id="smt_met">0</td>
+                                <td style="text-align:right" id="smt_res">0</td>
+                            </tr>                            
+                            <tr>
+                                <td>Simcards</td>
+                                <td align="center">UND</td>
+                                <td style="text-align:right" id="sim_eje">0</td>
+                                <td style="text-align:right" id="sim_met">0</td>
+                                <td style="text-align:right" id="sim_res">0</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="sbCierreD">
+                    <div class="ui-bar ui-bar-a">
+                        <h3>Cierres Diarios</h3>
+                    </div>
+                    <div class="ui-body ui-body-a">
+                        <label for="fechRCierreD">Fecha</label>
+                        <input type="date" id="fechRCierreD" onchange="chngFechaCierreVtas(this)"/>
+                        <input type="button" id="btn_cieresD" value="Actualizar" onclick="reloadVentas(1,1)"/> 
+                    </div><br />
+                    <div class="ui-body ui-body-a">
+                        <table style="font-size:0.85em" width="100%" data-role="table" data-mode="columntoggle" class="table-stripe ui-responsive">
+                        <thead>
+                            <tr>
+                                <th width="50%" align="center">Product</th>
+                                <th width="15%" align="center">Unidad</th>
+                                <th width="35%" align="right">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>EPIN</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="epin2_eje">0</td>
+                            </tr>
+                            <tr>
+                                <td>TMY</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tmy2_eje">0</td>
+                            </tr>
+                            <tr>
+                                <td>Tarjetas</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tar2_eje">0</td>
+                            </tr>                            
+                            <tr>
+                                <td>Tarjetas Vas</td>
+                                <td align="center">HNL</td>
+                                <td style="text-align:right" id="tvs2_eje">0</td>
+                            </tr>
+                            <tr>
+                                <td>Smartphones</td>
+                                <td align="center">UND</td>
+                                <td style="text-align:right" id="smt2_eje">0</td>
+                            </tr>                            
+                            <tr>
+                                <td>Simcards</td>
+                                <td align="center">UND</td>
+                                <td style="text-align:right" id="sim2_eje">0</td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    <div class="ui-body ui-body-a">
+                        <table width="100%">
+                            <tr><td width="40%">TOTAL</td><td align="center">HNL</td><td style="text-align:right" id="cierr_tot">0</td></tr>
+                        </table>
+                    </div><br />
+                    <div id="dvChartVtas" class="ui-body ui-body-a">
+                    </div>
+                    
+                </div>
+                <br /><br />
+            </div><!-- Pagina 2 -->
+
+            <div id="dvPlanningDMS" >
+                <div class="ui-body ui-body-a">
+                    <button onclick="getPlanningDMS()">Actualizar Planning</button>
+                    <label for="semanaAnio">Semana Num.</label>
+                    <select id="cbSemanaNum" onchange="changeSemanaPlan(this)">
+                        <option value="-">-</option>
+                    </select>
+                    <div id="dvPlanSemanal" style="margin-top:30px">                    
+                    </div>
+                </div>
+                <div data-role="collapsible" class="ui-collapsible" data-collapsed="false" data-iconpos="right" data-theme="a" style="margin-top:20px">
+                    <h3>PDVs</h3>
+                    <div id="dvPlanPDVs" class="ui-collapseible-content">                    
+                    </div>
+                </div> 
+                <div data-role="collapsible" class="ui-collapsible" data-collapsed="false" data-iconpos="right" style="margin-top:20px">
+                    <h3>Ficha PDV</h3>
+                    <div id="dvFichaPDV" class="ui-collapseible-content">                    
+                    </div>
+                </div>
+                <br />
+            </div>
+
+
+            <div id="dv_forms_template">
+                <div id="dv_forms_template_content"></div>
+            </div>
+
+            <div id="dvMainGerencial">
+                <label style="float:right; margin-top:15px; font-size:0.8em; color:blue; cursor:pointer" onclick="getDatosUsuario()">Actualizar</label>--
+                <div id="dvChartG1" style="width:102%"></div>
+            </div> 
+            <div id="dvRptG">
+                <div class="ui-body ui-body-a">
+                    <button onclick="getDtosG()">Actualizar</button>                    
+                    <select id="cbAnomesSucs" onchange="changeProduct()">
+                        <option value="0">-</option>
+                    </select>
+                </div>
+                <br />
+                <div class="ui-body ui-body-a">  
+                    <label for="semanaAnio">Producto</label>
+                    <select id="cbProductoDashG" onchange="changeProduct()" data-mini="true">
+                        <option value="EPIN">EPIN</option>
+                        <option value="TIGO MONEY">TIGO MONEY</option>
+                        <option value="TARJETA PREPAGO">TARJETA PREPAGO</option>
+                        <option value="TARJETA VAS">TARJETAS VAS</option>                        
+                        <option value="SIMCARDS">SIMCARDS</option>
+                        <option value="SMARTPHONES">SMARTPHONES</option>
+                    </select>              
+                    <div id="dvTblEjeSuc" style="margin-top:30px">                    
+                    </div>
+                </div>
+                <br />
+                <div id="dvDetSucursal" class="ui-body ui-body-a">
+                </div>
+                <br />
+                <div id="dvDetSucursalDiario" class="ui-body ui-body-a">
+                </div>
+            </div>
+            
+        </div>
+        <!-- div main -->  
+    </div>
+    <!-- end dvMain -->
+
+
+    <!-- Menu Lateral -->
+    <div data-role="panel" data-display="overlay" id="dvMenu" data-theme="c" style="position: fixed;">
+        <ul data-role="listview">
+            <li data-icon="false" style="background-color:#0B0B61; border:0; margin-left:-15px; margin-top:10px; margin-bottom:5px">
+                <table width="100%">
+                    <tr><td><center><label style="color:white">DMS Experience</label></center></td></tr>
+                    <tr><td align="center"><img id="imgUser" src="img/salesman.png" width="60%" style="border-radius:50%; margin:5px"/></td></tr>
+                    <tr><td><div id="dvUserName" style="color:white; text-align:center">User Name</div></td></tr>
+                </table>
+                <label style="color:white; text-align:center; font-size:0.7em">..........</label>
+            </li>
+            <li data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-home" style="text-align:left; background-color:#0B0B61;border:0; margin:0; margin-left:5px" onclick="switchMenu(0,0)">Inicio</button>
+                <!--<a href="#"  style="background-color: #0B0B61; border:0" onclick="switchMenu(0,0)"><h3>Home</h3></a>-->
+                <!--<a href="#" style="width:15%; margin:1px; height:40px; float:right; border:0px; align:right; background-color: #0B0B61; border:0" class="ui-btn ui-icon-delete ui-icon-notext" data-rel="close" data-target="#dvMenu"></a>-->
+            </li>
+            <li id="mnHorus" data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-location" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px;" onclick="switchMenu(0,2)">SO Horus</button>
+                <!--<a href="#" style="background-color: #0B0B61; border:0; border-top:solid thin #0A0A2A" onclick="switchMenu(1,1)"></a>-->
+            </li>
+            <li id="mnForms" data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-arrow-u-r" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px;" onclick="switchMenu(0,3)">Formularios DMS</button>
+                <!--<a href="#" style="background-color: #0B0B61; border:0; border-top:solid thin #0A0A2A" onclick="switchMenu(1,1)"></a>-->
+            </li>
+            <li id="mnRptVtas" data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-check" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px;" onclick="switchMenu(0,4)">Reporte Ventas</button>
+                <!--<a href="#" style="background-color: #0B0B61; border:0; border-top:solid thin #0A0A2A" onclick="switchMenu(1,1)"></a>-->
+            </li>
+
+            <li id="mnRptG" data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-check" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px;" onclick="switchMenu(0,6)">Reportes Gerenciales</button>
+                <!--<a href="#" style="background-color: #0B0B61; border:0; border-top:solid thin #0A0A2A" onclick="switchMenu(1,1)"></a>-->
+            </li>
+
+            <li id="mnDmsPlanin" data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-calendar" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px;" onclick="switchMenu(0,5)">DMS Planning</button>
+                <!--<a href="#" style="background-color: #0B0B61; border:0; border-top:solid thin #0A0A2A" onclick="switchMenu(1,1)"></a>-->
+            </li>            
+
+            <li data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <br /><br /><br />
+            </li>
+
+            <li data-icon="false" style="background-color:#0B0B61; border:0; padding:0">
+                <div class="lbar"></div>
+                <button data-icon="ui-btn ui-btn-icon-left ui-icon-power" style="text-align:left; background-color:#0B0B61; border:0; margin:0; margin-left:5px" onclick="logout()">Cerrar Sesion</button>
+            </li>            
+        </ul>
+    </div>
+    <!-- Fin Menu -->
+    
+</div>
+
+</body>
+
+<script src="https://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="js/highcharts.src.js"></script>
+<script type="text/javascript" src="js/highcharts-more.src.js"></script>
+<script src="https://code.highcharts.com/modules/variable-pie.js"></script>
+
+<script type="text/javascript" src="js/js_main.js"></script>
+<script type="text/javascript" src="js/js_db.js"></script>
+<!--<script type="text/javascript" src="js/toast.js"></script>-->
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript">  
+   
+    resizer();
+    app.initialize();
+function resizer(){
+    vW = $(window).width();
+    vH = $(window).height();
+
+
+    $("#bg_login").css('min-height', $(window).height());
+    $("#dvContentG").css('min-height', $(window).height()-45);
+
+    //$("#float_btn").css({'margin-top':vH-110, 'margin-left': vW - 100});
+    $("#mapHorus").css('min-height', vW*0.6);
+    $("#dvMenu").css({'height': $(window).height(), "overflow":'scroll'});
+}      
+</script>
+</html>
