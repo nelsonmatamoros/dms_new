@@ -42,7 +42,7 @@
   <plugin name="cordova-plugin-statusbar" source="npm" spec="^2.1.2"/>
   <plugin name="cordova-plugin-vibration" source="npm" spec="^2.1.0"/>  
   <plugin name="cordova-plugin-sms" source="npm" spec="^1.0.5"/>
-  <plugin name="cordova-plugin-background-mode" source="npm" spec="^0.7.2"/>
+  <plugin name="cordova-plugin-background-mode" source="npm" spec="^0.8.0"/>
   <plugin name="cordova-plugin-x-toast" source="npm" spec="^2.7.0"/>
 
   <platform name="android">

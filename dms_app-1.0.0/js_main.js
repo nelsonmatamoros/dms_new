@@ -7,7 +7,7 @@ var vTimerGPS; // = 30000;
 var vIdFormulario ='XO';
 var vLat = 0;
 var vLng = 0;
-//var ws_url = 'http://localhost:8090/ws_so/service_so.php'; 
+//var ws_url = 'http://localhost/ws_so/service_so.php'; 
 var ws_url = 'https://190.4.63.207/ws_so/service_so.php';
 var vMontoCredito = [];
 var vDatosUsuario ={"user":"", "login":"", "name":"", "phone":0, "email":"na", "job":"na", "id_dms":0, "perfil":0, "id_pdv_dlr":0};
@@ -105,6 +105,21 @@ var app = {
 $(document).ready(function(e){
 
     //tablero1G();
+     $("#infoPago").hide();
+
+    $("#estadoPago").on('change',function(){
+
+        if($(this).val() !='1'){
+
+            $("#infoPago").hide();
+
+        }else {
+
+            $("#infoPago").show();
+
+        }
+
+    })
 
     Highcharts.setOptions({
       credits: {
@@ -150,6 +165,7 @@ $(document).ready(function(e){
         vDatosUsuario.user = tempLogin.user;
         vDatosUsuario.login = vLogin;
         if(parseInt(vLogin) != 1){ 
+
             db.transaction(function(cmd){   
                 cmd.executeSql("SELECT * FROM users where login = ? ", [1], function (cmd, results) {
                     var len = results.rows.length, i;                    
@@ -193,7 +209,8 @@ $(document).ready(function(e){
                                     alert('Error consultando el servidor..');
                                     setTimeout(function(){window.location.replace('login.html');}, 800);
                                 }
-                        });                        	                                           
+                        });
+
                     }else if (len > 0){   
                         //window.location.replace('login.html');                         
                         //console.log('Loged In');
@@ -211,7 +228,11 @@ $(document).ready(function(e){
                         setTimeout(function(){
                             var strUrl = '';
                             var arrFile = [];
+
+
+
                             db.transaction(function(cmd2){
+
                                 cmd2.executeSql("SELECT * FROM tbl_files where id_file = ? order by correl asc", [vDatosUsuario.user], function (cmd2, results) {
                                     var len = results.rows.length;
                                     for(i=0;i<len; i++){
@@ -228,6 +249,7 @@ $(document).ready(function(e){
                                     }
                                 });
                             });
+
                         }, 500);
 
                     }else{
@@ -576,6 +598,7 @@ function switchMenu(vIdFrom, vIdTo){
         break;
         case 2:            
             hide_pags();
+            llenarPDVMarcacion();
             $('#lbl_title').html('SO - Horus');            
             $("#dvHead").show();
             $("#dvHorus").show();
@@ -2144,6 +2167,7 @@ function getPlanningDMS(){
     weekNum = getWeekNumber(fech);
 
     $.mobile.loading('show');
+
     $.ajax({
             url:ws_url,
             type:'POST',
@@ -2192,6 +2216,10 @@ function getPlanningDMS(){
                                 query += '\'' + vResult.fichas[i].segmento + '\')';
                                 ejecutaSQL(query, 0);
                             }
+
+                            llenarPDVMarcacion();
+
+
                         }, 3000);
                             
                         
@@ -2876,3 +2904,402 @@ function detallSucursal(vIdSucursal){
 
     
 }
+
+
+function  getMancha() {
+
+
+
+    $.ajax({
+                        url:ws_url,
+                        type:'POST',
+                        data:{m:307,vx:userWS, vy:pdwWS },        
+                        dataType:'text',
+                        beforeSend: function(){
+                            $.mobile.loading( 'show', {
+                                text: 'Cargando...',
+                                textVisible: true,
+                                theme: 'a',
+                                html: ""
+                            });
+                        },
+                        success: function(data){
+
+                            var respuestaData = eval(data);
+                            console.table(respuestaData); 
+
+                            ejecutaSQL('delete from tbl_nodos');
+
+
+                            for (var i = 0; i < respuestaData.length; i++) {
+
+                              ejecutaSQL('insert into tbl_nodos (nodo,coordenadas) values("'+respuestaData[i].nodo+'","'+respuestaData[i].coordenadas+'")',0);
+                                
+                            }
+
+                            $.mobile.loading('hide');
+                            dibujarMancha();
+
+                                
+                        }, 
+                        error: function(error){
+                            $.mobile.loading( 'show', {
+                                text: '',
+                                textVisible: true,
+                                textonly:true,
+                                theme: 'a',
+                                html: '<span><center><img src="img/noconection.png" width="60px" /></center><br />Error Consultando al Server</span>'
+                            });
+
+                            //setTimeout(function(){$.mobile.loading('hide');},1500);
+                        }
+                    
+                }); 
+    
+}
+
+function dibujarMancha(){
+
+    $.mobile.loading( 'show', {
+                                text: 'Cargando...',
+                                textVisible: true,
+                                theme: 'a',
+                                html: ""
+                            });
+
+    initMap(14.618086,-86.959082);
+
+    var nodosJson= [];
+
+        db.transaction(function(cmd2){
+
+            cmd2.executeSql("SELECT * FROM tbl_nodos where 1=1 ", null,function (cmd2, results) {
+                console.log(results);
+                var len = results.rows.length;
+
+                for(var i=0;i<len; i++){
+                    nodosJson.push({nodo:results.rows[i].nodo, coordenadas:results.rows[i].coordenadas});
+                }
+
+                 if(nodosJson.length>0){
+                                
+
+                    for (var i = 0 ; i<nodosJson.length ; i++ ){
+                                
+                                
+                           var poligono= LeerCoordenadas(nodosJson[i].coordenadas);
+                            
+                           var nodo = new google.maps.Polygon({
+                                            path: poligono,
+                                            strokeColor:"#2BDFE8",
+                                            strokeOpacity: 0.8,
+                                            strokeWeight: 2,
+                                            fillColor: "#2BDFE8" ,
+                                            fillOpacity: 0.35
+
+                                            });
+                                    
+                                    
+                           var bounds = new google.maps.LatLngBounds()
+                                    
+                           for (var pathidx = 0; pathidx < nodo.getPath().getLength(); pathidx++) { // se busca el centro del circuito 
+                                      bounds.extend(nodo.getPath().getAt(pathidx));
+                           }
+                                    
+
+                                   nodo.setMap(map) ;
+                                   nodo.center =bounds.getCenter();  
+                            
+                                   var infowindow = new google.maps.InfoWindow();
+                                   var title = '<p>Nombre de Nodo: '+nodosJson[i].nodo+'</p>';
+                                   
+                                    
+                                    nodo.addListener('click', (function(content) {
+                                        
+                                    return function() {
+                                        
+                                      infowindow.setContent(content);
+                                      infowindow.setPosition(this.center);
+                                      infowindow.open(map);
+                                    }
+                                    })(title)); 
+                            
+                            
+                        }// fin del for
+
+                               
+            } // fin del if
+
+            $.mobile.loading('hide');
+                
+            });
+
+
+        });    
+
+
+
+   
+
+}
+
+
+
+function LeerCoordenadas(cadenaCoordenadas){
+
+
+    
+   var cordenadasC = cadenaCoordenadas.replace(/ /g, "").split('|');
+    
+   //console.log(cordenadasC);
+   
+   var poligono = [];
+    
+    for (var i=0 ; i<cordenadasC.length-1;i++ ){
+        
+        var  cordenadas = cordenadasC[i].split(';')
+        
+        
+        poligono.push({ lng: parseFloat(cordenadas[0]), lat : parseFloat(cordenadas[1]) });
+    
+    
+    }
+    
+    //console.log(poligono);
+    
+    return poligono;
+    
+    
+}
+
+
+function llenarPDVMarcacion(){
+
+    //alert('llenar marcacion');
+
+    $.mobile.loading( 'show', {
+                                text: 'Cargando...',
+                                textVisible: true,
+                                theme: 'a',
+                                html: ""
+                            });
+
+    db.transaction(function(cmd2){
+
+            cmd2.executeSql("SELECT id_pdv, nombre_pdv FROM tbl_ficha_pdv where 1=1 ", null,function (cmd2, results) {
+                console.log(results);
+                var len = results.rows.length;
+                var html= '<option value="SELECCIONE">SELECCIONE</option>';
+
+                for(var i=0;i<len; i++){
+
+                   html+='<option value="'+results.rows[i].id_pdv+'">'+results.rows[i].nombre_pdv+'</option>';     
+                    
+                }
+
+                $("#marcancionE").html(html);
+                $('#marcancionE').val('SELECCIONE').change();
+               
+
+            $.mobile.loading('hide');
+                
+            });
+
+
+        });    
+
+
+}
+
+function guardarMarcacion(){
+
+    navigator.geolocation.getCurrentPosition(function(position){ // sucesss
+
+        //alert('marcaciones');
+        var latitud = position.coords.latitude;
+        var logitud = position.coords.longitude;
+        var date = new Date().formatoFecha();
+        var fecha=date;
+
+        //alert( fecha );
+
+        if ($("#marcancionE").val()!= 'SELECCIONE' && $("#marcancionE").val()!= 'SELECCIONE' && $("#telefono").val()!='' && $("#estadoPago").val()!='99' ){
+
+            var sql="insert into tbl_horus_marcas_esp (LATITUD,LONGITUD,ID_PDV,FECHA_COMPLETA,USUARIO,NUMERO_CLIENTE,ESTADO_PAGO,METODO_PAGO,MONTO_PAGO) values";
+                sql+="('"+position.coords.latitude+"','"+position.coords.longitude+"','"+$("#marcancionE").val()+"','"+fecha+"','"+vDatosUsuario.user+"',";
+                sql+="'"+$("#telefono").val()+"','"+$("#estadoPago").val()+"', '"+$("#metodoPago").val()+"','"+$("#monto").val()+"') ";
+                console.log(sql); 
+                ejecutaSQL(sql,0); 
+                alert('Marcacion Guardada de forma exitosa');  
+
+        }else{
+
+            alert('Faltan Datos');
+
+        }
+            
+    }, function(){ // error 
+
+            alert('No fue posible obtener sus coordenadas, favor verificar el estado del GPS de su teléfono');
+
+    }, { enableHighAccuracy: true });   // fin getcurrent position  
+
+      
+
+
+
+
+    
+}
+
+
+function enviarMarcacion(){
+
+    var envio = []; 
+
+    // primer paso es llenar con las marcaciones que estan guardadas 
+
+    $.mobile.loading( 'show', {
+                                text: 'Cargando...',
+                                textVisible: true,
+                                theme: 'a',
+                                html: ""
+                            });
+
+    db.transaction(function(cmd2){
+
+            cmd2.executeSql("SELECT  LATITUD,LONGITUD,ID_PDV,FECHA_COMPLETA,USUARIO,NUMERO_CLIENTE,ESTADO_PAGO,METODO_PAGO,MONTO_PAGO from tbl_horus_marcas_esp where 1=1 ", null,function (cmd2, results) {
+                console.log(results);
+                var len = results.rows.length;
+               
+
+                for(var i=0;i<len; i++){
+
+                  envio.push({id_pdv:results.rows[i].ID_PDV,   latitud:results.rows[i].LATITUD, longitud:results.rows[i].LONGITUD,
+                   fecha_completa:results.rows[i].FECHA_COMPLETA , usuario:results.rows[i].USUARIO  , numero_cliente:results.rows[i].NUMERO_CLIENTE,
+                   estado_pago:results.rows[i].ESTADO_PAGO, metodo_pago: results.rows[i].METODO_PAGO, monto_pago: results.rows[i].MONTO_PAGO
+                       });   
+                    
+                }
+
+                
+
+
+               
+
+
+            if ($("#marcancionE").val()!= 'SELECCIONE' && $("#telefono").val()!='' && $("#estadoPago").val()!='99' ){  //en caso que el formulario tenga datos 
+
+                navigator.geolocation.getCurrentPosition(function(position){ // sucesss // 
+
+                    //alert('marcaciones');
+                var latitud = position.coords.latitude;
+                var longitud = position.coords.longitude;
+                var date = new Date().formatoFecha();
+                var fecha=date;
+
+                envio.push({id_pdv: $("#marcancionE").val() ,latitud:position.coords.latitude, longitud:position.coords.longitude, 
+                fecha_completa:fecha , usuario:vDatosUsuario.user,numero_cliente:$("#telefono").val(),
+                   estado_pago:$("#estadoPago").val(), metodo_pago: $("#metodoPago").val(), monto_pago: $("#monto").val()
+
+            });   
+
+                    
+                    
+            
+                }, function(){ // error 
+
+                        alert('No fue posible obtener sus coordenadas, favor verificar el estado del GPS del dispositivo');
+
+                }, { enableHighAccuracy: true }); 
+
+
+            }  // fin del if   
+               
+               //ejecutaSQL('delete from tbl_horus_marcas_esp ', 0);
+
+            var control_envio = envio.length;   
+            console.table(envio);
+
+            for (var i = 0; i < envio.length; i++) {
+
+                control_envio--;
+
+                $.ajax({
+                        url:ws_url,
+                        type:'POST',
+                        data:{
+                        "m":308,
+                        "vx":userWS,
+                        "vy":pdwWS , 
+                        "latitud":envio[i].latitud,
+                        "longitud":envio[i].longitud,
+                        "id_pdv":envio[i].id_pdv, 
+                        "fecha_completa":envio[i].fecha_completa,
+                        "usuario":envio[i].usuario,
+                        "numero_cliente":envio[i].numero_cliente ,
+                        "estado_pago":envio[i].estado_pago,
+                        "metodo_pago":envio[i].metodo_pago,
+                        "monto_pago":envio[i].monto_pago
+
+                        },        
+                        dataType:'text',
+                        beforeSend: function(){
+                            $.mobile.loading( 'show', {
+                                text: 'Cargando...',
+                                textVisible: true,
+                                theme: 'a',
+                                html: ""
+                            });
+                        },
+                        success: function(data){
+
+                            console.log(data);
+
+                            if(control_envio ==0 ){
+
+                                $.mobile.loading('hide');
+
+                            } 
+
+                                
+                        }, 
+                        error: function(error){
+                           
+
+                            //setTimeout(function(){$.mobile.loading('hide');},1500);
+                        }
+                    
+                }); 
+
+
+
+                
+            }
+
+
+
+            //$.mobile.loading('hide');
+                
+            });
+
+
+        });    
+
+}
+
+
+Object.defineProperty(Date.prototype, 'formatoFecha', {
+    value: function() {
+        function pad2(n) {  //redeficnion de fecha
+            return (n < 10 ? '0' : '') + n;
+        }
+
+        return this.getFullYear() +'/'+
+               pad2(this.getMonth() + 1) + '/'+
+               pad2(this.getDate()) +' '+
+               pad2(this.getHours()) +':'+
+               pad2(this.getMinutes()) +':'+
+               pad2(this.getSeconds());
+    }
+});
